@@ -2,34 +2,41 @@
 #include "robotConfigs.h"
 
 // left motor group
-pros::MotorGroup left_motor_group({-1, 2, -3}, pros::MotorGears::blue);
+pros::MotorGroup left_motor_group({-17, -18, 19}, pros::MotorGears::blue);
 // right motor group
-pros::MotorGroup right_motor_group({4, -5, 6}, pros::MotorGears::green);
+pros::MotorGroup right_motor_group({1, -2, 3}, pros::MotorGears::blue);
+
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
                               &right_motor_group, // right motor group
                               10, // 10 inch track width
-                              lemlib::Omniwheel::NEW_4, // using new 4" omnis
-                              360, // drivetrain rpm is 360
+                              lemlib::Omniwheel::NEW_325, // tracking wheel type is new 3.25inch omniwheel
+                              450, // drivetrain rpm is 450
                               2 // horizontal drift is 2 (for now)
 );
+//top motor
+pros::Motor outake_motor(11, pros::MotorGears::blue);
+//flexwheel intake
+pros::Motor intake_motor(6, pros::MotorGears::green);
 
 // imu
-pros::Imu imu(10);
-// horizontal tracking wheel encoder
-pros::Rotation horizontal_encoder(20);
-// vertical tracking wheel encoder
-pros::adi::Encoder vertical_encoder('C', 'D', true);
+pros::Imu imu(12);
+//tracking rotation sensors
+pros::Rotation perpendicular_encoder(14);
+pros::Rotation parallel_encoder(13);
+
+//have to measure offset and trackwidth
+
 // horizontal tracking wheel
-lemlib::TrackingWheel horizontal_tracking_wheel(&horizontal_encoder, lemlib::Omniwheel::NEW_275, -5.75);
+lemlib::TrackingWheel parallel_tracking_wheel(&parallel_encoder, lemlib::Omniwheel::NEW_275, -5.75);
 // vertical tracking wheel
-lemlib::TrackingWheel vertical_tracking_wheel(&vertical_encoder, lemlib::Omniwheel::NEW_275, -2.5);
+lemlib::TrackingWheel perpendicular_tracking_wheel(&perpendicular_encoder, lemlib::Omniwheel::NEW_275, -2.5);
 
 // odometry settings
-lemlib::OdomSensors sensors(&vertical_tracking_wheel, // vertical tracking wheel 1, set to null
+lemlib::OdomSensors sensors(&perpendicular_tracking_wheel, // vertical tracking wheel 1, set to null
                             nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
-                            &horizontal_tracking_wheel, // horizontal tracking wheel 1
+                            &parallel_tracking_wheel, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
                             &imu // inertial sensor
 );
@@ -65,4 +72,17 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
                         sensors // odometry sensors
 );
 
+
+// PNEUMATICS
+pros::adi::DigitalOut wing('A');
+pros::adi::DigitalOut midscore('H');
+//pros::adi::DigitalOut limiter('B');
+//pros::adi::DigitalOut matchloader('C');
+
+//bool limiter_state = false;
+//bool matchloader_state = false;
+bool midscore_state = false;
+bool wing_state = true;
+
+//controler
 pros::Controller controller(pros::E_CONTROLLER_MASTER);

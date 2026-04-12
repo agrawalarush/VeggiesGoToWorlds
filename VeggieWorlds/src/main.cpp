@@ -7,7 +7,9 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+// initialize function. Runs on program startup
 void initialize() {
+    //Remember to set break modes   
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
     // print position to brain screen
@@ -22,6 +24,7 @@ void initialize() {
         }
     });
 }
+
 /**
  * Runs while the robot is in the disabled state of Field Management System or
  * the VEX Competition Switch, following either autonomous or opcontrol. When
@@ -66,17 +69,68 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+bool midscore_pressed = false;
+bool wing_pressed = false;
+// bool matchloader_pressed = false;
+// bool limiter_pressed = false;
 
 void opcontrol() {
     // loop forever
     while (true) {
-        // get left y and right x positions
+        /*Tank drive:
+		// get left y and right y positions
+        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        int rightY = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+
+        // move the robot
+        chassis.tank(leftY, rightY);*/
+		
+		// get left y and right x positions
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
         // move the robot
         chassis.arcade(leftY, rightX);
 
+	 	// ---------------------------
+     	// INTAKE
+     	// ---------------------------
+     	if (controller.get_digital(DIGITAL_R1))
+     	    intake_motor.move(-127);
+     	else if (controller.get_digital(DIGITAL_L1))
+     	    intake_motor.move(127);
+     	else
+     	    intake_motor.brake();
+
+        // ---------------------------
+        // OUTAKE
+     	// ---------------------------
+     	if (controller.get_digital(DIGITAL_R2))
+     	    outake_motor.move(-127);
+     	else if (controller.get_digital(DIGITAL_L2))
+     	    outake_motor.move(127);
+     	else
+     	    outake_motor.brake();
+
+	
+     	// WING TOGGLE
+     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_A) && !wing_pressed) {
+     	    wing_state = !wing_state;
+     	    wing.set_value(wing_state);
+     	    wing_pressed = true;
+     	}
+     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
+     	    wing_pressed = false;
+
+		// MIDSCORE TOGGLE
+     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B) && !midscore_pressed) {
+     	    midscore_state = !midscore_state;
+     	    midscore.set_value(midscore_state);
+     	    midscore_pressed = true;
+     	}
+     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
+     	    midscore_pressed = false;
+	
         // delay to save resources
         pros::delay(25);
     }
