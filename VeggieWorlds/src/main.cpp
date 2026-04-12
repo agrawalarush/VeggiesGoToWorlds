@@ -9,18 +9,23 @@
  */
 // initialize function. Runs on program startup
 void initialize() {
-    //Remember to set break modes   
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
+
+    left_motor_group.set_brake_mode_all(pros::E_MOTOR_BRAKE_COAST);
+    right_motor_group.set_brake_mode_all(pros::E_MOTOR_BRAKE_COAST);
+    intake_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    outake_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
     // print position to brain screen
     pros::Task screen_task([&]() {
         while (true) {
             // print robot location to the brain screen
-            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-            // delay to save resources
-            pros::delay(20);
+            pros::lcd::print(0, "X: %1.2f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %1.2f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %1.2f", chassis.getPose().theta); // heading
+			// delay to save resources
+            pros::delay(50);
         }
     });
 }
@@ -54,7 +59,12 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+    // set position to x:0, y:0, heading:0
+    chassis.setPose(0, 0, 0);
+    // turn to face heading 90 with a very long timeout
+    chassis.moveToPoint(0, 54, 10000);
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -77,8 +87,8 @@ bool wing_pressed = false;
 void opcontrol() {
     // loop forever
     while (true) {
-        /*Tank drive:
-		// get left y and right y positions
+        /*//Tank drive:
+		//get left y and right y positions
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightY = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
@@ -97,7 +107,7 @@ void opcontrol() {
      	// ---------------------------
      	if (controller.get_digital(DIGITAL_R1))
      	    intake_motor.move(-127);
-     	else if (controller.get_digital(DIGITAL_L1))
+     	else if (controller.get_digital(DIGITAL_R2))
      	    intake_motor.move(127);
      	else
      	    intake_motor.brake();
@@ -105,7 +115,7 @@ void opcontrol() {
         // ---------------------------
         // OUTAKE
      	// ---------------------------
-     	if (controller.get_digital(DIGITAL_R2))
+     	if (controller.get_digital(DIGITAL_L1))
      	    outake_motor.move(-127);
      	else if (controller.get_digital(DIGITAL_L2))
      	    outake_motor.move(127);

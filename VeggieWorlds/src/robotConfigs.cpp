@@ -10,8 +10,8 @@ pros::MotorGroup right_motor_group({1, -2, 3}, pros::MotorGears::blue);
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
                               &right_motor_group, // right motor group
-                              10, // 10 inch track width
-                              lemlib::Omniwheel::NEW_325, // tracking wheel type is new 3.25inch omniwheel
+                              11, // 11 inch track width
+                              lemlib::Omniwheel::NEW_325, // drivetrain wheel type is new 3.25inch omniwheel
                               450, // drivetrain rpm is 450
                               2 // horizontal drift is 2 (for now)
 );
@@ -29,14 +29,14 @@ pros::Rotation parallel_encoder(13);
 //have to measure offset and trackwidth
 
 // horizontal tracking wheel
-lemlib::TrackingWheel parallel_tracking_wheel(&parallel_encoder, lemlib::Omniwheel::NEW_275, -5.75);
+lemlib::TrackingWheel parallel_tracking_wheel(&parallel_encoder, lemlib::Omniwheel::NEW_2, -1);
 // vertical tracking wheel
-lemlib::TrackingWheel perpendicular_tracking_wheel(&perpendicular_encoder, lemlib::Omniwheel::NEW_275, -2.5);
+lemlib::TrackingWheel perpendicular_tracking_wheel(&perpendicular_encoder, lemlib::Omniwheel::NEW_2, -4.5);
 
 // odometry settings
-lemlib::OdomSensors sensors(&perpendicular_tracking_wheel, // vertical tracking wheel 1, set to null
+lemlib::OdomSensors sensors(&parallel_tracking_wheel, // horizontal tracking wheel 1
                             nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
-                            &parallel_tracking_wheel, // horizontal tracking wheel 1
+                            &perpendicular_tracking_wheel, // vertical tracking wheel 1, set to null
                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
                             &imu // inertial sensor
 );
@@ -45,23 +45,23 @@ lemlib::OdomSensors sensors(&perpendicular_tracking_wheel, // vertical tracking 
 lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               3, // derivative gain (kD)
-                                              3, // anti windup
-                                              1, // small error range, in inches
-                                              100, // small error range timeout, in milliseconds
-                                              3, // large error range, in inches
-                                              500, // large error range timeout, in milliseconds
-                                              20 // maximum acceleration (slew)
+                                              0, // anti windup
+                                              0, // small error range, in inches
+                                              0, // small error range timeout, in milliseconds
+                                              0, // large error range, in inches
+                                              0, // large error range timeout, in milliseconds
+                                              0 // maximum acceleration (slew)
 );
 
 // angular PID controller
-lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
+lemlib::ControllerSettings angular_controller(10, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              10, // derivative gain (kD)
-                                              3, // anti windup
-                                              1, // small error range, in degrees
-                                              100, // small error range timeout, in milliseconds
-                                              3, // large error range, in degrees
-                                              500, // large error range timeout, in milliseconds
+                                              93, // derivative gain (kD)
+                                              0, // anti windup
+                                              0, // small error range, in inches
+                                              0, // small error range timeout, in milliseconds
+                                              0, // large error range, in inches
+                                              0, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
 );
 

@@ -20,6 +20,10 @@ extern bool midscore_state;
 //extern bool matchloader_state;
 //extern bool limiter_state;
 
+extern pros::Imu imu;
+extern pros::Rotation perpendicular_encoder;
+extern pros::Rotation parallel_encoder;
+
 extern pros::Controller controller;
 
 #endif
