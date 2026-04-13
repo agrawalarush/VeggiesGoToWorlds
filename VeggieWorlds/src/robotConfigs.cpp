@@ -24,9 +24,8 @@ pros::Motor intake_motor(6, pros::MotorGears::green);
 pros::Imu imu(12);
 //tracking rotation sensors
 pros::Rotation perpendicular_encoder(14);
-pros::Rotation parallel_encoder(13);
+pros::Rotation parallel_encoder(-13);
 
-//have to measure offset and trackwidth
 
 // horizontal tracking wheel
 lemlib::TrackingWheel parallel_tracking_wheel(&parallel_encoder, lemlib::Omniwheel::NEW_2, -1);
@@ -42,9 +41,9 @@ lemlib::OdomSensors sensors(&parallel_tracking_wheel, // horizontal tracking whe
 );
 
 // lateral PID controller
-lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
+lemlib::ControllerSettings lateral_controller(5.8, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              3, // derivative gain (kD)
+                                              1, // derivative gain (kD)
                                               0, // anti windup
                                               0, // small error range, in inches
                                               0, // small error range timeout, in milliseconds
@@ -54,9 +53,9 @@ lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
 );
 
 // angular PID controller
-lemlib::ControllerSettings angular_controller(10, // proportional gain (kP)
+lemlib::ControllerSettings angular_controller(2, // 22 proportional gain (kP)
                                               0, // integral gain (kI)
-                                              93, // derivative gain (kD)
+                                              15.7, // derivative gain (kD)
                                               0, // anti windup
                                               0, // small error range, in inches
                                               0, // small error range timeout, in milliseconds
@@ -76,10 +75,10 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
 // PNEUMATICS
 pros::adi::DigitalOut wing('A');
 pros::adi::DigitalOut midscore('H');
-//pros::adi::DigitalOut limiter('B');
+pros::adi::DigitalOut limiter('G');
 //pros::adi::DigitalOut matchloader('C');
 
-//bool limiter_state = false;
+bool limiter_state = false;
 //bool matchloader_state = false;
 bool midscore_state = false;
 bool wing_state = true;

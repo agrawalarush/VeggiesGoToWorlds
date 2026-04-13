@@ -14,11 +14,13 @@ extern pros::Motor intake_motor;
 //pneumatics
 extern pros::adi::DigitalOut wing;
 extern pros::adi::DigitalOut midscore;
+extern pros::adi::DigitalOut limiter;
+//extern pros::adi::DigitalOut matchloader;
 
 extern bool wing_state;
 extern bool midscore_state;
 //extern bool matchloader_state;
-//extern bool limiter_state;
+extern bool limiter_state;
 
 extern pros::Imu imu;
 extern pros::Rotation perpendicular_encoder;

@@ -59,11 +59,14 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
+ASSET(Testing);
+ASSET(Left_Auton_1);
+ASSET(Left_Auton_2);
+ASSET(Left_Auton_3);
+ASSET(Left_Auton_4); 
 void autonomous() {
-    // set position to x:0, y:0, heading:0
-    chassis.setPose(0, 0, 0);
-    // turn to face heading 90 with a very long timeout
-    chassis.moveToPoint(0, 54, 10000);
+    chassis.setPose(0, 0, 0);    
+    chassis.follow(Left_Auton_1, 15, 2000);
 }
 
 /**
@@ -82,7 +85,7 @@ void autonomous() {
 bool midscore_pressed = false;
 bool wing_pressed = false;
 // bool matchloader_pressed = false;
-// bool limiter_pressed = false;
+bool limiter_pressed = false;
 
 void opcontrol() {
     // loop forever
@@ -140,7 +143,16 @@ void opcontrol() {
      	}
      	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
      	    midscore_pressed = false;
-	
+    
+        // limiter TOGGLE
+     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X) && !limiter_pressed) {
+     	    limiter_state = !limiter_state;
+     	    limiter.set_value(limiter_state);
+     	    limiter_pressed = true;
+     	}
+     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+     	    limiter_pressed = false;
+
         // delay to save resources
         pros::delay(25);
     }
