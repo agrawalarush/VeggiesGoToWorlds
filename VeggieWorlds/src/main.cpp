@@ -15,7 +15,7 @@ void initialize() {
     left_motor_group.set_brake_mode_all(pros::E_MOTOR_BRAKE_COAST);
     right_motor_group.set_brake_mode_all(pros::E_MOTOR_BRAKE_COAST);
     intake_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    outake_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    outake_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
     // print position to brain screen
     pros::Task screen_task([&]() {
@@ -84,7 +84,7 @@ void autonomous() {
  */
 bool midscore_pressed = false;
 bool wing_pressed = false;
-// bool matchloader_pressed = false;
+bool matchloader_pressed = false;
 bool limiter_pressed = false;
 
 void opcontrol() {
@@ -152,6 +152,15 @@ void opcontrol() {
      	}
      	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
      	    limiter_pressed = false;
+
+		 // limiter TOGGLE
+     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y) && !matchloader_pressed) {
+     	    matchloader_state = !matchloader_state;
+     	    matchloader.set_value(matchloader_state);
+     	    matchloader_pressed = true;
+     	}
+     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+     	    matchloader_pressed = false;
 
         // delay to save resources
         pros::delay(25);

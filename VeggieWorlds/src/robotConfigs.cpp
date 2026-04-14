@@ -76,10 +76,10 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
 pros::adi::DigitalOut wing('A');
 pros::adi::DigitalOut midscore('H');
 pros::adi::DigitalOut limiter('G');
-//pros::adi::DigitalOut matchloader('C');
+pros::adi::DigitalOut matchloader('F');
 
 bool limiter_state = false;
-//bool matchloader_state = false;
+bool matchloader_state = false;
 bool midscore_state = false;
 bool wing_state = true;
 
