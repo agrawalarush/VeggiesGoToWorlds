@@ -1,5 +1,13 @@
 #include "main.h"
+#include "pros/rtos.hpp"
 #include "robotConfigs.h"
+
+//helper functions:
+void intake(int speed // 127 for outtake, -127 for intake) 
+){
+	intake_motor.move(speed);
+	outake_motor.move(speed);
+}
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -59,14 +67,23 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-ASSET(Testing);
-ASSET(Left_Auton_1);
-ASSET(Left_Auton_2);
-ASSET(Left_Auton_3);
-ASSET(Left_Auton_4); 
 void autonomous() {
-    chassis.setPose(0, 0, 0);    
-    chassis.follow(Left_Auton_1, 15, 2000);
+    chassis.setPose(0,0,0);
+
+	chassis.moveToPose(3.14,27,17.25, 2000, {.minSpeed=50},false);//close to blocks
+	chassis.moveToPose(6, 33, 17.25, 1000);//pick up blocks (needs tuning)
+	limiter.set_value(true);
+	intake(127);
+	//matchloader.set_value(true);
+	//chassis.moveToPose(5.5, 32.5, 129.75, 500 ,{.forwards=false}); (old good for alignment)
+	pros::delay(2000);
+	intake(0);
+	/*chassis.moveToPose(-12, 45, 140, 2000, {.forwards=false},false); (perfect alignment to midgoal)
+	midscore.set_value(true);
+	limiter.set_value(false);
+	intake(127);
+	pros::delay(1000);
+	intake(0);*/
 }
 
 /**
@@ -87,12 +104,15 @@ bool wing_pressed = false;
 bool matchloader_pressed = false;
 bool limiter_pressed = false;
 
+//break between haptics
+bool haptics_cooldown = false;
+
 void opcontrol() {
     // loop forever
     while (true) {
-        /*//Tank drive:
+        //Tank drive:
 		//get left y and right y positions
-        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        /*int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightY = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
         // move the robot
@@ -108,9 +128,9 @@ void opcontrol() {
 	 	// ---------------------------
      	// INTAKE
      	// ---------------------------
-     	if (controller.get_digital(DIGITAL_R1))
+     	if (controller.get_digital(DIGITAL_L1))
      	    intake_motor.move(-127);
-     	else if (controller.get_digital(DIGITAL_R2))
+     	else if (controller.get_digital(DIGITAL_R1))
      	    intake_motor.move(127);
      	else
      	    intake_motor.brake();
@@ -118,10 +138,10 @@ void opcontrol() {
         // ---------------------------
         // OUTAKE
      	// ---------------------------
-     	if (controller.get_digital(DIGITAL_L1))
-     	    outake_motor.move(-127);
-     	else if (controller.get_digital(DIGITAL_L2))
+     	if (controller.get_digital(DIGITAL_R2))
      	    outake_motor.move(127);
+     	else if (controller.get_digital(DIGITAL_L2))
+     	    outake_motor.move(-127);
      	else
      	    outake_motor.brake();
 
@@ -136,30 +156,52 @@ void opcontrol() {
      	    wing_pressed = false;
 
 		// MIDSCORE TOGGLE
-     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B) && !midscore_pressed) {
+     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y) && !midscore_pressed) {
      	    midscore_state = !midscore_state;
      	    midscore.set_value(midscore_state);
      	    midscore_pressed = true;
      	}
-     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
+     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
      	    midscore_pressed = false;
+
+		//midscore haptics
+		if (midscore_state and !haptics_cooldown) {
+			controller.rumble("."); // short rumble when midscore is active
+			haptics_cooldown = true;
+		} else {
+			haptics_cooldown = false;
+		}
     
         // limiter TOGGLE
-     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X) && !limiter_pressed) {
+     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B) && !limiter_pressed) {
      	    limiter_state = !limiter_state;
      	    limiter.set_value(limiter_state);
      	    limiter_pressed = true;
      	}
-     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
      	    limiter_pressed = false;
+		
+		if (limiter_state and !haptics_cooldown) {
+			controller.rumble("--");
+		} else {
+			haptics_cooldown = false;
+		};
+		/*//limiter controller screen status show
+		if (limiter_state) {
+			controller.print(3, 0, "Limiter: ON");
+		} else if (!limiter_state) {
+			controller.print(3, 0, "Limiter: OFF");
+		} else {
+			controller.clear()
+		}*/
 
-		 // limiter TOGGLE
-     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y) && !matchloader_pressed) {
+		 // matchloader TOGGLE
+     	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X) && !matchloader_pressed) {
      	    matchloader_state = !matchloader_state;
      	    matchloader.set_value(matchloader_state);
      	    matchloader_pressed = true;
      	}
-     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+     	if (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
      	    matchloader_pressed = false;
 
         // delay to save resources

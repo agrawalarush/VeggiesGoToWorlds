@@ -41,9 +41,9 @@ lemlib::OdomSensors sensors(&parallel_tracking_wheel, // horizontal tracking whe
 );
 
 // lateral PID controller
-lemlib::ControllerSettings lateral_controller(5.8, // proportional gain (kP)
+lemlib::ControllerSettings lateral_controller(7.5,//5.8, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              1, // derivative gain (kD)
+                                              38,//1, // derivative gain (kD)
                                               0, // anti windup
                                               0, // small error range, in inches
                                               0, // small error range timeout, in milliseconds
@@ -53,9 +53,9 @@ lemlib::ControllerSettings lateral_controller(5.8, // proportional gain (kP)
 );
 
 // angular PID controller
-lemlib::ControllerSettings angular_controller(2, // 22 proportional gain (kP)
+lemlib::ControllerSettings angular_controller(4,//2, // 22 proportional gain (kP)
                                               0, // integral gain (kI)
-                                              15.7, // derivative gain (kD)
+                                              28,//18.85,//15.7, // derivative gain (kD)
                                               0, // anti windup
                                               0, // small error range, in inches
                                               0, // small error range timeout, in milliseconds
