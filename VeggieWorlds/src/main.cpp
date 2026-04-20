@@ -4,10 +4,22 @@
 #include "autons.h"
 
 //helper functions:
-void intake(int speed // 127 for outtake, -127 for intake) 
-){
-	intake_motor.move(speed);
-	outake_motor.move(speed);
+void score(int delay,int direction, bool mid){
+	limiter.set_value(false);
+	if (mid){
+		midscore.set_value(true);
+	} else {
+		midscore.set_value(false);
+	}
+	intake(200*direction, 600*direction);
+	pros::delay(delay);
+	intake(0, 0);
+}
+
+
+void intake(int in_speed, int out_speed ){
+	intake_motor.move_velocity(in_speed);//green-200
+	outake_motor.move_velocity(out_speed); //600
 }
 
 void driveMode (bool tank){
@@ -58,9 +70,9 @@ void initialize() {
     pros::Task screen_task([&]() {
         while (true) {
             // print robot location to the brain screen
-            pros::lcd::print(0, "X: %1.2f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %1.2f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %1.2f", chassis.getPose().theta); // heading
+            pros::lcd::print(0, "X: %1f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %1f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %1f", chassis.getPose().theta); // heading
 			// delay to save resources
             pros::delay(50);
         }
@@ -97,7 +109,7 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	fourPlusThree();
+	fourPlusThreeRight();
 }
 
 /**
@@ -125,6 +137,8 @@ bool haptics_cooldown = false;
 bool tank=false; //if false=arcade, else tank
 
 void opcontrol() {
+	left_motor_group.set_brake_mode_all(pros::MotorBrake::coast);
+	right_motor_group.set_brake_mode_all(pros::MotorBrake::coast);
     // loop forever
     while (true) {
 		//handles bot movment
@@ -134,9 +148,9 @@ void opcontrol() {
      	// INTAKE
      	// ---------------------------
      	if (controller.get_digital(DIGITAL_L1))
-     	    intake_motor.move(-127);
+     	    intake_motor.move_velocity(-200);
      	else if (controller.get_digital(DIGITAL_R1))
-     	    intake_motor.move(127);
+     	    intake_motor.move_velocity(200);
      	else
      	    intake_motor.brake();
 
@@ -144,9 +158,9 @@ void opcontrol() {
         // OUTAKE
      	// ---------------------------
      	if (controller.get_digital(DIGITAL_R2))
-     	    outake_motor.move(127);
+     	    outake_motor.move_velocity(600);
      	else if (controller.get_digital(DIGITAL_L2))
-     	    outake_motor.move(-127);
+     	    outake_motor.move_velocity(-600);
      	else
      	    outake_motor.brake();
 

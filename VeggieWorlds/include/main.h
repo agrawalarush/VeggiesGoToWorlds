@@ -67,7 +67,8 @@ void initialize(void);
 void disabled(void);
 void competition_initialize(void);
 void opcontrol(void);
-void intake(int);
+void intake(int,int);
+void score(int delay, int direction = 1, bool mid = false);
 #ifdef __cplusplus
 }
 #endif

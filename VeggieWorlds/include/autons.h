@@ -3,6 +3,7 @@
 #include "main.h"
 #include "lemlib/api.hpp"
 
-    void fourPlusThree();
-
+    void fourPlusThreeRight();
+    void sevenBlockLeft();
+    void tune();
 #endif
